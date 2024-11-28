@@ -11,7 +11,10 @@ public class HerStory {
 
     public static void main(String[] args) {
     
-        UserInterface ui = new UserInterface();
+        StoryManager storyManager = new StoryManager();
+        
+        UpdatedUI ui = new UpdatedUI(storyManager);
+        //UserInterface ui = new UserInterface();
         
     }
     
