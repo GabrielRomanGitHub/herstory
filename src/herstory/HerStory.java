@@ -13,7 +13,9 @@ public class HerStory {
     
         StoryManager storyManager = new StoryManager();
         
-        UpdatedUI ui = new UpdatedUI(storyManager);
+        FinalUI ui = new FinalUI(storyManager);
+        
+        //UpdatedUI ui = new UpdatedUI(storyManager);
         //UserInterface ui = new UserInterface();
         
     }

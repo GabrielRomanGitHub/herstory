@@ -2,6 +2,7 @@ package herstory;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,22 +13,22 @@ import javax.swing.border.Border;
 //National College of Ireland
 //x23155841
 
-public class UpdatedUI extends JFrame implements ActionListener{
+public class FinalUI extends JFrame implements ActionListener{
     //Border to check placement issues
     private Border border = BorderFactory.createLineBorder(Color.black);
     
     //Get the storyManager
-    private StoryManager storyManager; 
+    private StoryManager storyManager;
     
     //Check current Panel
-    
     private String currentPanel;
     
-    //UpdateUI
+    //Constructor
     private JFrame frame;
+    
+    //Create All Panels
     private JPanel landingPanel;
     private JPanel storiesPanel;
-    private JPanel viewStoryPanel;
     private JPanel addStoryPanel;
     private JPanel storyUploadedPanel;
     private ImageIcon logo;
@@ -60,15 +61,14 @@ public class UpdatedUI extends JFrame implements ActionListener{
     private JLabel nameLabel;
     private JLabel storyLabel;
     
-    //ShowStory
+    //ShowStoryPanel
     private JPanel showStoryPanel;
     private JLabel showStoryNameLabel;
     private JLabel showStoryTextLabel;
     private ImageIcon showImageIcon;
     private JLabel showImageLabel;
     
-    
-    UpdatedUI(StoryManager storyManager){
+    FinalUI(StoryManager storyManager){
         //Get the storyManager
         this.storyManager = storyManager;
         storyManager.readAndUpdateStories();
@@ -80,43 +80,30 @@ public class UpdatedUI extends JFrame implements ActionListener{
         frame.setResizable(false);
         frame.setSize(500, 500);
         
-        //Create landing JPanel
+        //Create back button
+        backButton = new JButton();
+        backButton.setBounds(15,420,100,30);
+        backButton.setFocusable(false);
+        backButton.setText("\u21A9 Back");
+        backButton.addActionListener(this);
+        
+        // Create icon for the frame
+        ImageIcon appIcon = new ImageIcon(getClass().getResource("icon.png"));
+        frame.setIconImage(appIcon.getImage());
+        
+        //Display frame
+        frame.setLayout(null);
+        frame.setVisible(true);
+        
+        createAllPanels();
+        goToLandingPanel();
+    }
+    
+    private void createAllPanels(){
+        //---------- Create landing JPanel ----------
         landingPanel = new JPanel();
         landingPanel.setBounds(0,0,500,500);
         landingPanel.setLayout(null);
-        frame.add(landingPanel);
-        
-        //Create stories JPanel
-        storiesPanel = new JPanel();
-        storiesPanel.setBounds(0,0,500,500);
-        storiesPanel.setLayout(null);
-        frame.add(storiesPanel);
-        
-        //Create viewStories JPanel
-        viewStoryPanel = new JPanel();
-        viewStoryPanel.setBounds(0,0,500,500);
-        viewStoryPanel.setLayout(null);
-        frame.add(viewStoryPanel);
-        
-        //Create addStory JPanel
-        addStoryPanel = new JPanel();
-        addStoryPanel.setBounds(0,0,500,500);
-        addStoryPanel.setLayout(null);
-        frame.add(addStoryPanel);
-        
-        //Create storyUploaded JPanel
-        storyUploadedPanel = new JPanel();
-        storyUploadedPanel.setBounds(0,0,500,500);
-        storyUploadedPanel.setLayout(null);
-        frame.add(storyUploadedPanel);
-        
-        //Display only landingPanel first
-        storiesPanel.setVisible(false);
-        viewStoryPanel.setVisible(false);
-        addStoryPanel.setVisible(false);
-        storyUploadedPanel.setVisible(false);
-        
-        //-------------------- Set up landingPanel --------------------
         
         //Title Image
         logo = new ImageIcon(getClass().getResource("logo.png"));
@@ -133,17 +120,31 @@ public class UpdatedUI extends JFrame implements ActionListener{
         storiesButton.setBounds(75,300,150,30);
         storiesButton.setFocusable(false);
         storiesButton.setText("Check Stories");
-        storiesButton.addActionListener(this);
+        storiesButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                goToStoriesPanel();
+            }
+        });
         landingPanel.add(storiesButton);
         
         addStoryButton = new JButton();
         addStoryButton.setBounds(250,300,150,30);
         addStoryButton.setFocusable(false);
         addStoryButton.setText("Add a Story");
-        addStoryButton.addActionListener(this);
+        addStoryButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                goToAddStoryPanel();
+            }
+        });
         landingPanel.add(addStoryButton);
         
-        //-------------------- Set up AddStoryPanel --------------------
+        //---------- Create add story JPanel ----------
+        addStoryPanel = new JPanel();
+        addStoryPanel.setBounds(0,0,500,500);
+        addStoryPanel.setLayout(null);
+        
         addTitleLabel = new JLabel();
         addTitleLabel.setText("Name:");
         addTitleLabel.setBounds(50,100,100,15);
@@ -215,9 +216,7 @@ public class UpdatedUI extends JFrame implements ActionListener{
                 storyManager.copyImageToFolder(selectedImageFile);
                 storyManager.addStory(name, story);
 
-                currentPanel = "storyUploadedPanel";
-                System.out.println("Moving to StoryUploadedPanel.");
-                updatePanels();
+                goToStoryUploadedPanel();
                 
                 addTitleField.setText("");
                 addStoryTextArea.setText("");
@@ -227,13 +226,20 @@ public class UpdatedUI extends JFrame implements ActionListener{
         });
         addStoryPanel.add(submitButton);
         
-        //-------------------- Set up StoryUploadedPanel --------------------
+        //---------- Create story uploaded JPanel ----------
+        storyUploadedPanel = new JPanel();
+        storyUploadedPanel.setBounds(0,0,500,500);
+        storyUploadedPanel.setLayout(null);
+        
         uploadMessage = new JLabel();
         uploadMessage.setText("Your story was succesfully uploaded.");
         uploadMessage.setBounds(140,200,250,35);
         storyUploadedPanel.add(uploadMessage);
         
-        //-------------------- Set up storiesPanel --------------------
+        //---------- Create stories JPanel ----------
+        storiesPanel = new JPanel();
+        storiesPanel.setBounds(0,0,500,500);
+        storiesPanel.setLayout(null);
         
         mainStoriesPanel = new JPanel();
         mainStoriesPanel.setLayout(null);
@@ -242,30 +248,38 @@ public class UpdatedUI extends JFrame implements ActionListener{
         storiesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         storiesPanel.add(storiesScrollPane);
         
-        // Add back button to necessary panels
-        backButton = new JButton();
-        backButton.setBounds(15,420,100,30);
-        backButton.setFocusable(false);
-        backButton.setText("\u21A9 Back");
-        backButton.addActionListener(this);
+        //---------- Create show story JPanel ----------
+        showStoryPanel = new JPanel();
+        showStoryPanel.setBounds(0,0,500,500);
+        showStoryPanel.setLayout(null);
         
-        // Create icon for the frame
-        ImageIcon appIcon = new ImageIcon(getClass().getResource("icon.png"));
-        frame.setIconImage(appIcon.getImage());
+        showStoryNameLabel = new JLabel();
+        showStoryNameLabel.setBounds(45,50,100,15);
+        showStoryPanel.add(showStoryNameLabel);
         
-        //Display frame
-        frame.setLayout(null);
-        frame.setVisible(true);
+        showStoryTextLabel = new JLabel();
+        showStoryTextLabel.setVerticalAlignment(SwingConstants.TOP);
+        showStoryTextLabel.setBounds(45,85,250,250);
+        showStoryPanel.add(showStoryTextLabel);
+        
+        showImageIcon = new ImageIcon();
+        
+        showImageLabel = new JLabel(showImageIcon);
+        showImageLabel.setBounds(325,85,100,125);
+        showStoryPanel.add(showImageLabel);
     }
     
-    private void updateLandingPanel(){
+    private void goToLandingPanel(){
         title.setBounds(100,75,300,50);
+        
         landingPanel.add(title);
+        frame.add(landingPanel);
+        frame.repaint();
+        currentPanel = "landingPanel";
     }
     
-    private void updateStoriesPanel(){
-        
-        frame.remove(storiesPanel);
+    private void goToStoriesPanel(){
+        frame.remove(landingPanel);
         
         newHeight = 0;
         
@@ -275,22 +289,22 @@ public class UpdatedUI extends JFrame implements ActionListener{
             
             if(currentStory != null){
                 individualStoryPanel = new JPanel();
-                individualStoryPanel.setPreferredSize(new Dimension(400,100));
-                individualStoryPanel.setMaximumSize(new Dimension(400,100));
+                individualStoryPanel.setBounds(0,i*50,400,50);
+                
                 individualStoryPanel.setBorder(border);
                 individualStoryPanel.setLayout(null);
                 
                 nameLabel = new JLabel(currentStory.getName());
-                nameLabel.setBounds(15,10,350,15);
+                nameLabel.setBounds(15,10,260,15);
                 
                 storyLabel = new JLabel(currentStory.getStory());
-                storyLabel.setBounds(15,25,350,15);
+                storyLabel.setBounds(15,25,260,15);
                 
-                readStoryButton = new JButton();
+                readStoryButton = new JButton("Read");
                 readStoryButton.setBounds(300,14,75,25);
-                readStoryButton.addActionListener(e -> showStory(currentStory));
+                readStoryButton.addActionListener(e -> goToShowStoryPanel(currentStory));
+                System.out.println("Story added.");
                 
-                individualStoryPanel.setBounds(0,i*50,382,50);
                 individualStoryPanel.add(nameLabel);
                 individualStoryPanel.add(storyLabel);
                 individualStoryPanel.add(readStoryButton);
@@ -301,129 +315,105 @@ public class UpdatedUI extends JFrame implements ActionListener{
         
         newHeight = (storyManager.getNumOfStories())*50;
         mainStoriesPanel.setPreferredSize(new Dimension (380, newHeight));
+        storiesScrollPane.getViewport().setViewSize(new Dimension(380, newHeight));
+        
         mainStoriesPanel.revalidate();
         mainStoriesPanel.repaint();
         
-        storiesPanel.add(backButton);
-        mainStoriesPanel.revalidate();
-        
+        storiesScrollPane.revalidate();
         storiesScrollPane.repaint();
+        
+        storiesPanel.revalidate();
+        storiesPanel.repaint();
+        
+        storiesPanel.add(backButton);
         frame.add(storiesPanel);
         frame.repaint();
-    }
-    
-    private void updateAddStoryPanel(){
-        addStoryPanel.add(backButton);
         
-        // Move the title to the top
-        title.setBounds(100,20,300,50);
-        addStoryPanel.add(title);
+        currentPanel = "storiesPanel";
     }
     
-    private void updateStoryUploadedPanel(){
-        storyUploadedPanel.add(backButton);
-    }
-    
-    private void updatePanels(){
-        //Set all panels to not visible and show the required panel only
-        landingPanel.setVisible(false);
-        storiesPanel.setVisible(false);
-        viewStoryPanel.setVisible(false);
-        addStoryPanel.setVisible(false);
-        storyUploadedPanel.setVisible(false);
-        
-        if(currentPanel.equals("landingPanel")){
-            updateLandingPanel();
-            landingPanel.setVisible(true);
-            System.out.println("landingPanel has been set to visible.");
-        }
-        if(currentPanel.equals("storiesPanel")){
-            updateStoriesPanel();
-            storiesPanel.setVisible(true);
-            System.out.println("storiesPanel has been set to visible.");
-        }
-        if(currentPanel.equals("viewStoryPanel")){
-            viewStoryPanel.setVisible(true);
-        }
-        if(currentPanel.equals("addStoryPanel")){
-            updateAddStoryPanel();
-            addStoryPanel.setVisible(true);
-        }
-        if(currentPanel.equals("storyUploadedPanel")){
-            updateStoryUploadedPanel();
-            storyUploadedPanel.setVisible(true);
-        }
-    }
-    
-    public void showStory(Story story){
+    private void goToShowStoryPanel(Story story){
         frame.remove(storiesPanel);
+        
         System.out.println("showing story.");
         
         currentPanel = "showStory";
         
-        showStoryPanel = new JPanel();
-        showStoryPanel.setBounds(0,0,500,500);
-        showStoryPanel.setLayout(null);
-        
-        showStoryNameLabel = new JLabel();
         showStoryNameLabel.setText(story.getName());
-        showStoryNameLabel.setBounds(50,130,100,15);
-        showStoryPanel.add(showStoryNameLabel);
         
-        showStoryTextLabel = new JLabel();
         showStoryTextLabel.setText("<html><body>"+story.getStory()+"</body></html>");
-        showStoryTextLabel.setBounds(50,200,200,200);
-        showStoryPanel.add(showStoryTextLabel);
+
+        showImageIcon.setImage(new ImageIcon(story.getImagePath()).getImage());
+        Image resizedImage = showImageIcon.getImage();
         
-        showImageIcon = new ImageIcon("../../storyImagesFolder");
-        
-        showImageLabel = new JLabel(showImageIcon);
-        showImageLabel.setBounds(100,100,200,200);
-        showStoryPanel.add(showImageLabel);
+        showImageIcon.setImage(resizedImage.getScaledInstance(100, 125, Image.SCALE_SMOOTH));
         
         showStoryPanel.add(backButton);
         frame.add(showStoryPanel);
+        frame.repaint();
+        
+        currentPanel = "showStoryPanel";
     }
     
-    @Override
+    private void goToAddStoryPanel(){
+        frame.remove(landingPanel);
+        
+        // Move the title to the top
+        title.setBounds(100,20,300,50);
+        
+        addStoryPanel.add(backButton);
+        addStoryPanel.add(title);
+        
+        frame.add(addStoryPanel);
+        frame.repaint();
+        
+        addStoryTextArea.revalidate();
+        addStoryTextArea.repaint();
+        
+        currentPanel = "addStoryPanel";
+    }
+    
+    private void goToStoryUploadedPanel(){
+        frame.remove(addStoryPanel);
+        
+        title.setBounds(100,20,300,50);
+        
+        storyUploadedPanel.add(backButton);
+        storyUploadedPanel.add(title);
+        
+        frame.add(storyUploadedPanel);
+        frame.repaint();
+        
+        currentPanel = "storyUploadedPanel";
+    }
+    
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==storiesButton){
-            currentPanel = "storiesPanel";
-            System.out.println("Moving to storiesPanel.");
-            updatePanels();
-        }
-        if(e.getSource()==addStoryButton){
-            currentPanel = "addStoryPanel";
-            System.out.println("Moving to addStoryPanel.");
-            updatePanels();
-        }
         if(e.getSource()==backButton){
-            if(currentPanel.equals("addStoryPanel")){
-                currentPanel = "landingPanel";
-                System.out.println("Moving to landingPanel.");
-                updatePanels();
-            }
-            if(currentPanel.equals("storiesPanel")){
-                currentPanel = "landingPanel";
-                System.out.println("Moving to landingPanel.");
+            if(currentPanel=="storiesPanel"){
+                frame.remove(storiesPanel);
                 individualStoryPanel = null;
-                storyManager.readAndUpdateStories();
-                updatePanels();
+                
+                goToLandingPanel();
+                currentPanel = "landingPanel";
             }
-            if(currentPanel.equals("viewStoryPanel")){
+            if(currentPanel=="showStoryPanel"){
+                frame.remove(showStoryPanel);
+                
+                goToStoriesPanel();
                 currentPanel = "storiesPanel";
-                System.out.println("Moving to storiesPanel.");
-                updatePanels();
             }
-            if(currentPanel.equals("storyUploadedPanel")){
+            if(currentPanel=="addStoryPanel"){
+                frame.remove(addStoryPanel);
+                
+                goToLandingPanel();
+                currentPanel = "landingPanel";
+            }
+            if(currentPanel=="storyUploadedPanel"){
+                frame.remove(storyUploadedPanel);
+                
+                goToAddStoryPanel();
                 currentPanel = "addStoryPanel";
-                System.out.println("Moving to addStoryPanel.");
-                updatePanels();
-            }
-            if(currentPanel.equals("showStoryPanel")){
-                currentPanel = "storiesPanel";
-                System.out.println("Moving to storiesPanel");
-                updatePanels();
             }
         }
     }
